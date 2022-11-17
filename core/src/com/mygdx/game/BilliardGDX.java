@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
@@ -16,10 +17,7 @@ public class BilliardGDX extends ApplicationAdapter {
 	Texture texture;
 	ShapeDrawer drawer;
 	OrthographicCamera camera;
-	int xVel = 5;
-	int xPos = 50;
-	int yVel = 3;
-	int yPos = 50;
+	Ball ball;
 	
 	@Override
 	public void create () {
@@ -37,6 +35,8 @@ public class BilliardGDX extends ApplicationAdapter {
 		TextureRegion region = new TextureRegion(texture, 0, 0, 1, 1);
 
 		drawer = new ShapeDrawer(batch, region);
+
+		ball = new Ball(40, new Vector2(50, 50), 5, 3, Color.WHITE);
 	}
 
 	@Override
@@ -47,18 +47,7 @@ public class BilliardGDX extends ApplicationAdapter {
 
 		batch.begin();
 
-		if(xPos >= camera.viewportWidth - 40 || xPos <= 0 + 40) {
-			xVel *= -1;
-			System.out.println("Bounce!");
-		}
-		if(yPos >= camera.viewportHeight - 40 || yPos <= 0 + 40) {
-			yVel *= -1;
-			System.out.println("Bounce!");
-		}
-
-		drawer.filledCircle(xPos, yPos, 40);
-		xPos += xVel;
-		yPos += yVel;
+		ball.update(drawer, camera.viewportWidth, camera.viewportHeight);
 
 		batch.end();
 	}
