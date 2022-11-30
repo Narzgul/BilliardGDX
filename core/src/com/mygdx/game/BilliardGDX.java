@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import java.util.ArrayList;
+
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 public class BilliardGDX extends ApplicationAdapter {
@@ -17,7 +19,7 @@ public class BilliardGDX extends ApplicationAdapter {
 	Texture texture;
 	ShapeDrawer drawer;
 	OrthographicCamera camera;
-	Ball ball;
+	ArrayList<Ball> balls;
 	
 	@Override
 	public void create () {
@@ -36,7 +38,16 @@ public class BilliardGDX extends ApplicationAdapter {
 
 		drawer = new ShapeDrawer(batch, region);
 
-		ball = new Ball(40, new Vector2(50, 50), 5, 3, Color.WHITE);
+		balls = new ArrayList<>();
+		Ball whiteBall = new Ball(40, new Vector2(50, 50), 5, 3, Color.WHITE);
+		Ball blackBall = new Ball(40, new Vector2(50, camera.viewportHeight - 50), 5, 3, Color.BLACK);
+		Ball blueBall = new Ball(40, new Vector2(camera.viewportWidth - 50, 50), 5, 3, Color.BLUE);
+		Ball redBall = new Ball(40, new Vector2(camera.viewportWidth - 50, camera.viewportHeight - 50), 5, 3, Color.RED);
+
+		balls.add(whiteBall);
+		balls.add(blackBall);
+		balls.add(blueBall);
+		balls.add(redBall);
 	}
 
 	@Override
@@ -47,7 +58,15 @@ public class BilliardGDX extends ApplicationAdapter {
 
 		batch.begin();
 
-		ball.update(drawer, camera.viewportWidth, camera.viewportHeight);
+		for(Ball ball : balls) {
+			for (Ball compBall : balls) {
+				if (compBall != ball  && getDistance(ball, compBall) <= 0) {
+					ball.setXVel(ball.getXVel() + compBall.getXVel());
+					ball.setYVel(ball.getYVel() + compBall.getYVel());
+				}
+			}
+			ball.update(drawer, camera.viewportWidth, camera.viewportHeight);
+		}
 
 		batch.end();
 	}
@@ -56,5 +75,13 @@ public class BilliardGDX extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		texture.dispose();
+	}
+
+	private double getDistance(Ball ball1, Ball ball2) {
+		return Math.sqrt(
+					Math.pow(ball1.getPos().x - ball2.getPos().x, 2)
+					+ Math.pow(ball1.getPos().y - ball2.getPos().y, 2)
+				)
+				- (ball1.getRadius() + ball2.getRadius());
 	}
 }
